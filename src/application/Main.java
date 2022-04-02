@@ -32,6 +32,7 @@ import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.filechooser.FileNameExtensionFilter;
+import javax.swing.text.Element;
 
 import javax.swing.UIManager;
 
@@ -41,16 +42,21 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.Toolkit;
+import java.awt.Color;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.awt.event.WindowStateListener;
 import java.awt.event.WindowAdapter;
 
-public final class Main extends JFrame implements ActionListener, ItemListener {
+public final class Main extends JFrame implements ActionListener, ItemListener, WindowStateListener {
 	static UIManager UIManager = new UIManager();
 	JFileChooser fileChooser_Java = new JFileChooser(System.getProperty("user.dir"));
 	JFileChooser fileChooser_CSharp = new JFileChooser(System.getProperty("user.dir"));
@@ -79,17 +85,19 @@ public final class Main extends JFrame implements ActionListener, ItemListener {
     
     JMenuBar menuBar = new JMenuBar();
 	
-	JLabel label_Java = new JLabel("Java:");
+	JLabel label_Java = new JLabel("Java");
 	JTextArea textArea_Java = new JTextArea(12, 27);
+	JTextArea margin_Java = new JTextArea("1");
 	JTextField textField_Java = new JTextField("Lines: ; Characters: ", 27);
-	JScrollPane jsp_Java = new JScrollPane(textArea_Java);
+	JScrollPane jsp_Java = new JScrollPane();
 	JButton button_JavaSave = new JButton("Save");
 	JButton button_JavaLoad = new JButton("Load");
 	
-	JLabel label_CSharp = new JLabel("C#:");
+	JLabel label_CSharp = new JLabel("C#");
 	JTextArea textArea_CSharp = new JTextArea(12, 27);
+	JTextArea margin_CSharp = new JTextArea("1");
 	JTextField textField_CSharp = new JTextField("Lines: ; Characters: ", 27);
-	JScrollPane jsp_CSharp = new JScrollPane(textArea_CSharp);
+	JScrollPane jsp_CSharp = new JScrollPane();
 	JButton button_CSharpTrans = new JButton("Translate"); // Translate Java to C#
 	JButton button_CSharpSave = new JButton("Save");
 	
@@ -98,7 +106,7 @@ public final class Main extends JFrame implements ActionListener, ItemListener {
 	public Main() {
 		setTitle("Java to C# Cross-Compiler");
 		setSize(650,540);
-		setResizable(false);
+		//setResizable(false);
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 	    addWindowListener(new WindowAdapter() {
 	    	@Override
@@ -136,6 +144,66 @@ public final class Main extends JFrame implements ActionListener, ItemListener {
 	    
 	    //list_SegSelect.addListSelectionListener(listSeleMod_SegSelect);
 	    
+		textArea_Java.getDocument().addDocumentListener(new DocumentListener() {
+			public String getText() {
+				int docLength = textArea_Java.getDocument().getLength();
+				Element root = textArea_Java.getDocument().getDefaultRootElement();
+				String text = "1" + System.getProperty("line.separator");
+				for (int i=2;i<root.getElementIndex(docLength)+2;i++) {
+					text += i + System.getProperty("line.separator");
+				}
+				return text;
+			}
+			
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				updateCharCount('J');
+				margin_Java.setText(getText());
+			}
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				updateCharCount('J');	
+				margin_Java.setText(getText());
+			}
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				updateCharCount('J');	
+				margin_Java.setText(getText());
+			}
+		});		
+		jsp_Java.getViewport().add(textArea_Java);
+		jsp_Java.setRowHeaderView(margin_Java);
+		
+		textArea_CSharp.getDocument().addDocumentListener(new DocumentListener() {
+			public String getText() {
+				int docLength = textArea_CSharp.getDocument().getLength();
+				Element root = textArea_CSharp.getDocument().getDefaultRootElement();
+				String text = "1" + System.getProperty("line.separator");
+				for (int i=2;i<root.getElementIndex(docLength)+2;i++) {
+					text += i + System.getProperty("line.separator");
+				}
+				return text;
+			}
+			
+			@Override
+			public void changedUpdate(DocumentEvent e) {
+				updateCharCount('C');
+				margin_CSharp.setText(getText());
+			}
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				updateCharCount('C');	
+				margin_CSharp.setText(getText());
+			}
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				updateCharCount('C');	
+				margin_CSharp.setText(getText());
+			}
+		});
+		jsp_CSharp.getViewport().add(textArea_CSharp);
+		jsp_CSharp.setRowHeaderView(margin_CSharp);
+	    
 	    // --
 	    
 	    mainPanel1.resetToPreferredSizes();
@@ -143,11 +211,11 @@ public final class Main extends JFrame implements ActionListener, ItemListener {
 	    mainPanel1.setDividerSize(-1);
 	    
 	    sub2PanelLeft.resetToPreferredSizes();
-	    sub2PanelLeft.setDividerLocation(360);
+	    sub2PanelLeft.setDividerLocation(460);
 	    sub2PanelLeft.setDividerSize(-1);
 	    
 	    sub3PanelLeft1.resetToPreferredSizes();
-	    sub3PanelLeft1.setDividerLocation(340);
+	    sub3PanelLeft1.setDividerLocation(440);
 	    sub3PanelLeft1.setDividerSize(-1);
 	    
 	    sub3PanelLeft2.resetToPreferredSizes();
@@ -155,11 +223,11 @@ public final class Main extends JFrame implements ActionListener, ItemListener {
 	    sub3PanelLeft2.setDividerSize(-1);
 	    
 	    sub2PanelRight.resetToPreferredSizes();
-	    sub2PanelRight.setDividerLocation(360);
+	    sub2PanelRight.setDividerLocation(460);
 	    sub2PanelRight.setDividerSize(-1);
 	    
 	    sub3PanelRight1.resetToPreferredSizes();
-	    sub3PanelRight1.setDividerLocation(340);
+	    sub3PanelRight1.setDividerLocation(440);
 	    sub3PanelRight1.setDividerSize(-1);
 	    
 	    sub3PanelRight2.resetToPreferredSizes();
@@ -167,8 +235,12 @@ public final class Main extends JFrame implements ActionListener, ItemListener {
 	    sub3PanelRight2.setDividerSize(-1);
 	    
 	    textArea_CSharp.setEditable(false);
+	    margin_Java.setEditable(false);
+	    margin_CSharp.setEditable(false);
 	    textField_Java.setEditable(false);
 	    textField_CSharp.setEditable(false);
+	    
+	    
 	    
 	    // --
 	    
@@ -201,8 +273,16 @@ public final class Main extends JFrame implements ActionListener, ItemListener {
 	    mainPanel1.add(sub2PanelLeft);
 	    mainPanel1.add(sub2PanelRight);
 	    
+	   // textArea_CSharp.setBackground(Color.BLACK);
+	    
 		setJMenuBar(menuBar);
 	    add(mainPanel1);
+	    addComponentListener(new ComponentAdapter() {
+	    	public void componentResized(ComponentEvent e) {
+	    		resizeComponents(getSize().getHeight(), getSize().getWidth());	    	    
+	    	}
+	    });
+	    addWindowStateListener(this);
 		setVisible(true);
 	}
 	
@@ -245,13 +325,117 @@ public final class Main extends JFrame implements ActionListener, ItemListener {
 	            	writeTextTo(textArea_CSharp.getText(), currentFile);
 	        	}
 			} else if (cmd.equals("Translate")) {
-				// fileOp.translate(textArea_Java, textArea_CSharp);				
+				fileOp.translate(textArea_Java, textArea_CSharp);				
+			} else if (cmd.equals("UpdateSize")) {
+				resizeComponents(getSize().getHeight(), getSize().getWidth());
 			}
 	}
 	
 	// Checks All State Changes
 	public void itemStateChanged(ItemEvent e) {
 		
+	}
+	
+	/*
+	@Override
+	public void windowStateChanged(WindowEvent e) {		
+		System.out.println("aaaa");
+		resizeComponents();
+	}
+	
+	@Override
+	public void windowOpened(WindowEvent e) {		
+		System.out.println("opened");
+		resizeComponents();
+	}
+	
+	@Override
+	public void windowClosing(WindowEvent e) {		
+		System.out.println("closing");
+		resizeComponents();
+	}
+	
+	@Override
+	public void windowClosed(WindowEvent e) {		
+		System.out.println("closed");
+		resizeComponents();
+	}
+	
+	@Override
+	public void windowActivated(WindowEvent e) {		
+		System.out.println("activated");
+		resizeComponents();
+	}
+	
+	@Override
+	public void windowDeactivated(WindowEvent e) {		
+		System.out.println("deactivated");
+		resizeComponents();
+	}
+	
+	@Override
+	public void windowIconified(WindowEvent e) {		
+		System.out.println("iconified");
+		resizeComponents();
+	}
+	
+	@Override
+	public void windowDeiconified(WindowEvent e) {		
+		System.out.println("deiconified");
+		resizeComponents();
+	}
+	*/
+	
+	@Override
+	public void windowStateChanged(WindowEvent e) {				
+		Timer count = new Timer(50, this);
+		count.setActionCommand("UpdateSize");
+		count.setRepeats(false);
+		count.start();
+	}
+	
+	private void resizeComponents(double height, double width) {
+		int nWidth = (int) (width * .5);
+		int nHeight1 = (int) (height - 190);
+		int nHeight2 = (int) (nHeight1 - 20);
+		
+	    mainPanel1.setDividerLocation(nWidth);	    	    
+	    sub2PanelLeft.setDividerLocation(nHeight1);	    	    
+	    sub3PanelLeft1.setDividerLocation(nHeight2);	    	     	    
+	    sub2PanelRight.setDividerLocation(nHeight1);	    	    
+	    sub3PanelRight1.setDividerLocation(nHeight2);
+	}
+	
+	private void updateCharCount(char key) {
+		if (key == 'J') {
+			int charCount = 0;
+			int lineCount = 1;
+			String text = textArea_Java.getText();
+			
+			for (int i=0;i<text.length();i++) {
+				if (text.substring(i, i+1).equals("\n")) {
+					lineCount++;
+					charCount--;
+				}
+				charCount++;
+			}
+			
+			textField_Java.setText("Lines: " + lineCount + "; Characters: " + charCount);
+		} else if (key == 'C') {
+			int charCount = 0;
+			int lineCount = 1;
+			String text = textArea_CSharp.getText();
+			
+			for (int i=0;i<text.length();i++) {
+				if (text.substring(i, i+1).equals("\n")) {
+					lineCount++;
+					charCount--;
+				}
+				charCount++;
+			}
+			
+			textField_CSharp.setText("Lines: " + lineCount + "; Characters: " + charCount);
+		}
 	}
 	
 	// Starts-Up the App	
@@ -316,104 +500,3 @@ public final class Main extends JFrame implements ActionListener, ItemListener {
 		}
 	}
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* Original
-
-import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.stage.Stage;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonType;
-import javafx.scene.layout.BorderPane;
-
-public class Main extends Application {
-	@Override
-	public void start(Stage primaryStage) {
-		primaryStage.setOnCloseRequest(evt -> {
-			if (!Controller.javaSaved || !Controller.cSaved) {
-				Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "You have unsaved changes, are you sure you want to quit?", ButtonType.YES, ButtonType.CANCEL);
-				ButtonType result = alert.showAndWait().orElse(ButtonType.CANCEL);
-				if (ButtonType.CANCEL.equals(result)) {
-					evt.consume();
-				}
-			}
-		});
-		try {
-			BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("GUI.fxml"));
-			Scene scene = new Scene(root);
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-			primaryStage.setScene(scene);
-			primaryStage.setMinHeight(400);
-			primaryStage.setMinWidth(700);
-			primaryStage.show();
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
-	
-	public static void main(String[] args) {
-		launch(args);
-	}
-}
-*/
